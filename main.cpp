@@ -248,20 +248,20 @@ struct puzzle_state
 		return retVal;
 	}
 
-	bool operator<=(const puzzle_state& r) const
-	{
-		int left = manhattan_distance_heuristic();
-		int right = r.manhattan_distance_heuristic();
-
-		return (left <= right);
-	}
-
 	bool operator<(const puzzle_state& r) const
 	{
 		int left = manhattan_distance_heuristic();
 		int right = r.manhattan_distance_heuristic();
 		
 		return (left < right);
+	}
+
+	bool operator>(const puzzle_state& r) const
+	{
+		int left = manhattan_distance_heuristic();
+		int right = r.manhattan_distance_heuristic();
+
+		return (left > right);
 	}
 
 	bool operator==(const puzzle_state& r) const
@@ -308,10 +308,10 @@ void test_lots()
 
 	int p_t = p.manhattan_distance_heuristic();
 
-	std::priority_queue<puzzle_state, std::vector<puzzle_state>, std::less<puzzle_state> > q;
+	std::priority_queue<puzzle_state, std::vector<puzzle_state>, std::greater<puzzle_state> > q;
 	//std::set<puzzle_state, std::less<puzzle_state> > q;
 
-	for (int i = 0; i < 10000000; i++)
+	for (int i = 0; i < 1000000; i++)
 	{
 		puzzle_state p = puzzle_state::randomize();
 
