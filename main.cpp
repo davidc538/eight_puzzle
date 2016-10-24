@@ -67,18 +67,21 @@ struct puzzle_state
 		return retVal;
 	}
 
+	static void get_x_y_from_place(int place, int& x, int& y)
+	{
+		x = place % 3;
+		y = place / 3;
+	}
+
 	static int manhattan_distance(int first, int second)
 	{
 		int first_x, first_y, second_x, second_y, dist_x, dist_y, retVal;
 
-		first_x = first % 3;
-		first_y = first / 3;
-
-		second_x = second % 3;
-		second_y = second / 3;
+		get_x_y_from_place(first, first_x, first_y);
+		get_x_y_from_place(second, second_x, second_y);
 
 		dist_x = first_x - second_x;
-		dist_y = second_x - second_y;
+		dist_y = first_y - second_y;
 
 		dist_x = abs(dist_x);
 		dist_y = abs(dist_y);
@@ -88,10 +91,22 @@ struct puzzle_state
 		return retVal;
 	}
 
+	int empty_tile() const
+	{
+		for (int i = 0; i < 9; i++)
+			if (places[i] == 0)
+				return i;
+
+		return -1;
+	}
 	
 	std::vector<puzzle_state> all_possible_moves() const
 	{
 		std::vector<puzzle_state> retVal;
+
+		int space = empty_tile();
+
+
 
 		// TODO: actually implement this
 		retVal.push_back(puzzle_state());
@@ -126,21 +141,41 @@ struct puzzle_state
 		std::string retVal = "";
 
 		for (int i = 0; i < 9; i++)
+		{
 			retVal += std::to_string(places[i]);
+
+			if (i % 3 == 2)
+				retVal += "\r\n";
+		}
 
 		return retVal;
 	}
 };
 
+void test_man_dist()
+{
+	int i, x, y;
+
+	for (i = 0; i < 9; i++)
+	{
+		puzzle_state::get_x_y_from_place(i, x, y);
+		std::cout << i << " : " << x << " , " << y << std::endl;
+	}
+}
+
 int main(int argc, char** argv)
 {
+	test_man_dist();
+
 	puzzle_state p;
+
+	std::cout << p.to_string() << " , " << p.manhattan_distance_heuristic() << std::endl;
 
 	int p_t = p.manhattan_distance_heuristic();
 
 	std::priority_queue<puzzle_state, std::vector<puzzle_state>, std::less<puzzle_state> > q;
 
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 1000000; i++)
 	{
 		puzzle_state p = puzzle_state::randomize();
 		
