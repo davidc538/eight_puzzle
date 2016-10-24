@@ -344,12 +344,21 @@ void test_all_possible_moves()
 	}
 }
 
+struct puzzle_state_search
+{
+	puzzle_state current, came_from;
+};
+
+std::vector<puzzle_state_search> find_solution(puzzle_state initial_state)
+{
+	return std::vector<puzzle_state_search>();
+}
+
 int main(int argc, char** argv)
 {
 	//test_man_dist();
 	//test_lots();
-
-	test_all_possible_moves();
+	//test_all_possible_moves();
 
 	std::cin.get();
 }
