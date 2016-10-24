@@ -360,9 +360,9 @@ std::vector<puzzle_state_search> find_solution(puzzle_state initial_state)
 
 int main(int argc, char** argv)
 {
-	//test_man_dist();
-	//test_lots();
-	//test_all_possible_moves();
+	test_man_dist();
+	test_lots();
+	test_all_possible_moves();
 
 	std::cin.get();
 }
