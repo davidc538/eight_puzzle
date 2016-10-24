@@ -4,6 +4,7 @@
 #include <queue>
 #include <functional>
 #include <string>
+#include <algorithm>
 
 struct randomizer
 {
