@@ -287,6 +287,11 @@ struct puzzle_state
 
 		return retVal;
 	}
+
+	int current_heuristic() const
+	{
+		return manhattan_distance_heuristic();
+	}
 };
 
 void test_man_dist()
@@ -350,7 +355,36 @@ void test_all_possible_moves()
 
 struct puzzle_state_search
 {
-	puzzle_state current, came_from;
+	puzzle_state came_from, current;
+	int steps_taken;
+
+	puzzle_state_search(const puzzle_state& came_from, const puzzle_state& current, int steps_taken)
+	{
+		this->came_from = came_from.copy();
+		this->current = current.copy();
+		this->steps_taken = steps_taken;
+	}
+
+	int heuristic() const
+	{
+		return current.current_heuristic() + steps_taken;
+	}
+
+	bool operator<(const puzzle_state_search& r) const
+	{
+		int h1 = heuristic(),
+			h2 = r.heuristic();
+
+		return (h1 < h2);
+	}
+
+	bool operator>(const puzzle_state_search& r) const
+	{
+		int h1 = heuristic(),
+			h2 = r.heuristic();
+
+		return (h1 > h2);
+	}
 };
 
 std::vector<puzzle_state_search> find_solution(puzzle_state initial_state)
