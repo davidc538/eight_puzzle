@@ -43,6 +43,16 @@ struct puzzle_state
 			places[i] = i;
 	}
 
+	puzzle_state copy() const
+	{
+		puzzle_state retVal;
+
+		for (int i = 0; i < 9; i++)
+			retVal.places[i] = places[i];
+
+		return retVal;
+	}
+
 	static puzzle_state randomize()
 	{
 		puzzle_state retVal;
@@ -187,7 +197,7 @@ struct puzzle_state
 
 		if (x != 0)
 		{
-			puzzle_state p = *this;
+			puzzle_state p = this->copy();
 
 			p.slide_left();
 
@@ -196,7 +206,7 @@ struct puzzle_state
 
 		if (x != 2)
 		{
-			puzzle_state p = *this;
+			puzzle_state p = this->copy();
 
 			p.slide_right();
 
@@ -205,7 +215,7 @@ struct puzzle_state
 
 		if (y != 2)
 		{
-			puzzle_state p = *this;
+			puzzle_state p = this->copy();
 
 			p.slide_down();
 
@@ -214,7 +224,7 @@ struct puzzle_state
 
 		if (y != 0)
 		{
-			puzzle_state p = *this;
+			puzzle_state p = this->copy();
 
 			p.slide_up();
 
@@ -261,12 +271,6 @@ struct puzzle_state
 				return false;
 
 		return true;
-	}
-
-	void operator=(const puzzle_state& r)
-	{
-		for (int i = 0; i < 9; i++)
-			places[i] = r.places[i];
 	}
 
 	std::string to_string() const
