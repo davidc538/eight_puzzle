@@ -7,6 +7,7 @@
 #include <string>
 #include <algorithm>
 #include <set>
+#include <memory>
 
 struct randomizer
 {
@@ -41,6 +42,11 @@ struct puzzle_state
 	{
 		for (int i = 0; i < 9; i++)
 			places[i] = i;
+	}
+
+	bool is_solved() const
+	{
+		return (manhattan_distance_heuristic() == 0);
 	}
 
 	puzzle_state copy() const
@@ -365,6 +371,23 @@ struct puzzle_state_search
 		this->steps_taken = steps_taken;
 	}
 
+	bool is_solved() const
+	{
+		return current.is_solved();
+	}
+
+	std::vector<puzzle_state_search> all_possible_moves() const
+	{
+		std::vector<puzzle_state> p = current.all_possible_moves();
+
+		std::vector<puzzle_state_search> r;
+
+		for (const auto& i : p)
+			r.emplace_back(current, i, steps_taken + 1);
+
+		return r;
+	}
+
 	int heuristic() const
 	{
 		return current.current_heuristic() + steps_taken;
@@ -389,7 +412,28 @@ struct puzzle_state_search
 
 std::vector<puzzle_state_search> find_solution(puzzle_state initial_state)
 {
-	return std::vector<puzzle_state_search>();
+	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, std::greater<puzzle_state_search> > q;
+
+	q.emplace(initial_state, initial_state, 0);
+
+	while (!q.empty())
+	{
+		auto t = q.top();
+		q.pop();
+
+		auto v = t.all_possible_moves();
+
+		for (const auto& a : v)
+		{
+			q.push(a);
+		}
+	}
+
+	std::vector<puzzle_state_search> v;
+	
+	// TODO: build vector
+
+	return v;
 }
 
 int main(int argc, char** argv)
