@@ -1,6 +1,6 @@
 C_FILES=main.cpp
 STD=-std=c++11
-R_FLAGS=-O2
+R_FLAGS=-O3 -s
 D_FLAGS=-g
 
 all: eight_gcc eight_gcc_d eight_clang eight_clang_d
