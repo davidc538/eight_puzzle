@@ -400,8 +400,6 @@ struct puzzle_state_search
 		return current.is_solved();
 	}
 
-
-	// TODO: come back here when adding new puzzle_state_search constructor
 	std::vector<puzzle_state_search> all_possible_moves() const
 	{
 		std::vector<puzzle_state> p = current.all_possible_moves();
