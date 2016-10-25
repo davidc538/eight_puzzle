@@ -414,7 +414,7 @@ struct puzzle_state_search
 		std::vector<puzzle_state_search> r;
 
 		for (const auto& i : p)
-			r.emplace_back(current, i, steps_taken + 1);
+			r.emplace_back(*this, i);
 
 		return r;
 	}
@@ -468,33 +468,33 @@ std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& 
 
 	while (!queue.empty())
 	{
-		auto t = queue.top();
+		auto current = queue.top();
 		queue.pop();
 
-		auto v = t.all_possible_moves();
+		auto vec = current.all_possible_moves();
 
-		for (const auto& a : v)
+		for (const auto& current : vec)
 		{
-			if (a.is_solved())
+			if (current.is_solved())
 			{
-				steps_taken = a.steps_taken;
+				steps_taken = current.steps_taken;
 
 				std::vector<puzzle_state> retVal;
 
-				for (const auto& b : a.previous_states)
+				for (const auto& b : current.previous_states)
 					retVal.push_back(b->copy());
 
 				std::reverse(retVal.begin(), retVal.end());
 
-				retVal.push_back(a.current);
+				retVal.push_back(current.current);
 
 				return retVal;
 			}
 
-			if (std::find(expanded_states.begin(), expanded_states.end(), a.current) == expanded_states.end())
+			if (std::find(expanded_states.begin(), expanded_states.end(), current.current) == expanded_states.end())
 			{
-				queue.push(a);
-				expanded_states.insert(a.current);
+				queue.push(current);
+				expanded_states.insert(current.current);
 			}
 		}
 	}
