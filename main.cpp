@@ -49,6 +49,17 @@ struct puzzle_state
 		return (manhattan_distance_heuristic() == 0);
 	}
 
+	// for comparisons in std::set
+	long long hash() const
+	{
+		long long retVal = 0;
+		
+		for (int i = 0; i < 9; i++)
+			retVal += i * places[i];
+
+		return retVal;
+	}
+
 	puzzle_state copy() const
 	{
 		puzzle_state retVal;
