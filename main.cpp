@@ -395,6 +395,30 @@ struct hash_comparator
 	}
 };
 
+struct puzzle_state_search_queue
+{
+	std::priority_queue<puzzle_state_search, std::deque<puzzle_state_search>, distance_hash_comparator> _queue;
+
+	void enqueue(const puzzle_state_search& item)
+	{
+		_queue.push(item);
+	}
+
+	puzzle_state_search dequeue()
+	{
+		puzzle_state_search retVal = _queue.top();
+
+		_queue.pop();
+
+		return retVal;
+	}
+
+	bool is_empty()
+	{
+		return _queue.empty();
+	}
+};
+
 struct puzzle_state_set
 {
 	std::set<puzzle_state, hash_comparator> _states;
@@ -412,15 +436,14 @@ struct puzzle_state_set
 
 std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& steps_taken)
 {
-	std::priority_queue<puzzle_state_search, std::deque<puzzle_state_search>, distance_hash_comparator> queue;
+	puzzle_state_search_queue queue;
 	puzzle_state_set expanded_states;
 
-	queue.emplace(initial_state, initial_state, 0);
+	queue.enqueue(puzzle_state_search(initial_state, initial_state, 0));
 
-	while (!queue.empty())
+	while (!queue.is_empty())
 	{
-		auto current = queue.top();
-		queue.pop();
+		auto current = queue.dequeue();
 
 		auto all = current.all_possible_moves();
 
@@ -444,7 +467,7 @@ std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& 
 
 			if (!expanded_states.contains(i.current))
 			{
-				queue.push(i);
+				queue.enqueue(i);
 				expanded_states.insert(i.current);
 			}
 		}
