@@ -436,14 +436,14 @@ struct puzzle_state_set
 
 std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& steps_taken)
 {
-	puzzle_state_search_queue queue;
+	puzzle_state_search_queue search_queue;
 	puzzle_state_set expanded_states;
 
-	queue.enqueue(puzzle_state_search(initial_state, initial_state, 0));
+	search_queue.enqueue(puzzle_state_search(initial_state, initial_state, 0));
 
-	while (!queue.is_empty())
+	while (!search_queue.is_empty())
 	{
-		auto current = queue.dequeue();
+		auto current = search_queue.dequeue();
 
 		auto all = current.all_possible_moves();
 
@@ -467,7 +467,7 @@ std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& 
 
 			if (!expanded_states.contains(i.current))
 			{
-				queue.enqueue(i);
+				search_queue.enqueue(i);
 				expanded_states.insert(i.current);
 			}
 		}
