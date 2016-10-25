@@ -425,10 +425,18 @@ struct puzzle_state_search
 	}
 };
 
+struct puzzle_state_comparator
+{
+	bool operator() (const puzzle_state& l, const puzzle_state& r) const
+	{
+		return (l.hash() < r.hash());
+	}
+};
+
 std::vector<puzzle_state_search> find_solution(const puzzle_state& initial_state)
 {
 	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, std::greater<puzzle_state_search> > q;
-	std::set<puzzle_state> expanded_states;
+	std::set<puzzle_state, puzzle_state_comparator> expanded_states;
 
 	q.emplace(initial_state, initial_state, 0);
 
