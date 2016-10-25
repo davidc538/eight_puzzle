@@ -376,18 +376,12 @@ void test_all_possible_moves()
 
 struct puzzle_state_search
 {
-	//std::shared_ptr<puzzle_state> came_from, current;
-
 	std::vector<std::shared_ptr<puzzle_state> > previous_states;
 	puzzle_state current;
 	int steps_taken;
 
 	puzzle_state_search(const puzzle_state& came_from, const puzzle_state& current, int steps_taken)
 	{
-		//this->came_from = std::make_shared<puzzle_state>(came_from.copy());
-		//this->current = std::make_shared<puzzle_state>(current.copy());
-		//this->came_from = came_from.copy();
-
 		// this invokes the constructor -> puzzle_state(const puzzle_state& copy_me)
 		previous_states.push_back(std::make_shared<puzzle_state>(came_from));
 
@@ -395,15 +389,26 @@ struct puzzle_state_search
 		this->steps_taken = steps_taken;
 	}
 
+	puzzle_state_search(const puzzle_state_search& came_from, const puzzle_state& current)
+	{
+		for (const auto& state : came_from.previous_states)
+			previous_states.push_back(state);
+
+		previous_states.push_back(std::make_shared<puzzle_state>(came_from.current));
+
+		this->current = current.copy();
+		this->steps_taken = came_from.steps_taken + 1;
+	}
+
 	bool is_solved() const
 	{
-		//return current->is_solved();
 		return current.is_solved();
 	}
 
+
+	// TODO: come back here when adding new puzzle_state_search constructor
 	std::vector<puzzle_state_search> all_possible_moves() const
 	{
-		//std::vector<puzzle_state> p = current->all_possible_moves();
 		std::vector<puzzle_state> p = current.all_possible_moves();
 
 		std::vector<puzzle_state_search> r;
@@ -416,10 +421,9 @@ struct puzzle_state_search
 
 	int heuristic() const
 	{
-		//return current->current_heuristic() + steps_taken;
 		return current.current_heuristic() + steps_taken;
 	}
-
+	// /*
 	bool operator<(const puzzle_state_search& r) const
 	{
 		int h1 = heuristic(),
@@ -435,9 +439,18 @@ struct puzzle_state_search
 
 		return (h1 > h2);
 	}
+	//*/
 };
 
-struct puzzle_state_comparator
+struct puzzle_state_search_comparator_manhattan_distance
+{
+	bool operator() (const puzzle_state_search& l, const puzzle_state_search& r)
+	{
+		return (l.current.manhattan_distance_heuristic() < r.current.manhattan_distance_heuristic());
+	}
+};
+
+struct puzzle_state_comparator_hash
 {
 	bool operator() (const puzzle_state& l, const puzzle_state& r) const
 	{
@@ -445,17 +458,18 @@ struct puzzle_state_comparator
 	}
 };
 
-std::vector<puzzle_state_search> find_solution(const puzzle_state& initial_state)
+std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& steps_taken)
 {
-	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, std::greater<puzzle_state_search> > q;
-	std::set<puzzle_state, puzzle_state_comparator> expanded_states;
+	//std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, puzzle_state_search_comparator_manhattan_distance > q;
+	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, std::greater<puzzle_state_search> > queue;
+	std::set<puzzle_state, puzzle_state_comparator_hash> expanded_states;
 
-	q.emplace(initial_state, initial_state, 0);
+	queue.emplace(initial_state, initial_state, 0);
 
-	while (!q.empty())
+	while (!queue.empty())
 	{
-		auto t = q.top();
-		q.pop();
+		auto t = queue.top();
+		queue.pop();
 
 		auto v = t.all_possible_moves();
 
@@ -463,22 +477,29 @@ std::vector<puzzle_state_search> find_solution(const puzzle_state& initial_state
 		{
 			if (a.is_solved())
 			{
-				std::cout << "found solution!" << std::endl;
+				steps_taken = a.steps_taken;
+
+				std::vector<puzzle_state> retVal;
+
+				for (const auto& b : a.previous_states)
+					retVal.push_back(b->copy());
+
+				std::reverse(retVal.begin(), retVal.end());
+
+				retVal.push_back(a.current);
+
+				return retVal;
 			}
 
 			if (std::find(expanded_states.begin(), expanded_states.end(), a.current) == expanded_states.end())
 			{
-				q.push(a);
+				queue.push(a);
 				expanded_states.insert(a.current);
 			}
 		}
 	}
 
-	std::vector<puzzle_state_search> v;
-	
-	// TODO: build vector
-
-	return v;
+	return std::vector<puzzle_state>();
 }
 
 int main(int argc, char** argv)
@@ -488,7 +509,21 @@ int main(int argc, char** argv)
 	test_lots();
 	test_all_possible_moves();
 	*/
-	auto a = find_solution(puzzle_state::randomize());
+	puzzle_state initial = puzzle_state::randomize();
+
+	std::cout << "INITIAL STATE: " << std::endl;
+	std::cout << initial.to_string() << std::endl;
+
+	int steps_taken = -1;
+
+	auto a = find_solution(initial, steps_taken);
+
+	for (const auto& b : a)
+	{
+		std::cout << b.to_string() << std::endl;
+	}
+
+	std::cout << "total steps taken: " << steps_taken << std::endl;
 
 	std::cin.get();
 }
