@@ -317,8 +317,6 @@ void test_lots()
 
 	std::cout << p.to_string() << " , " << p.manhattan_distance_heuristic() << std::endl;
 
-	int p_t = p.manhattan_distance_heuristic();
-
 	std::priority_queue<puzzle_state, std::vector<puzzle_state>, std::greater<puzzle_state> > q;
 	//std::set<puzzle_state, std::less<puzzle_state> > q;
 
