@@ -356,8 +356,8 @@ struct hybrid_comparator
 			r_man = r.current.manhattan_distance(),
 			l_steps = l.steps_taken,
 			r_steps = r.steps_taken,
-			l_h = (l_cor + l_man + l_steps),
-			r_h = (r_cor + r_man + r_steps);
+			l_h = (0 - l_cor + l_man + l_steps),
+			r_h = (0 - r_cor + r_man + r_steps);
 
 		return (l_h > r_h);
 	}
@@ -396,7 +396,7 @@ struct hash_comparator
 
 std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& steps_taken)
 {
-	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, distance_hash_comparator> queue;
+	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, hybrid_comparator> queue;
 	std::set<puzzle_state, hash_comparator> expanded_states;
 
 	queue.emplace(initial_state, initial_state, 0);
@@ -456,7 +456,7 @@ void test()
 
 int main(int argc, char** argv)
 {
-	puzzle_state initial = puzzle_state::randomize(20);
+	puzzle_state initial = puzzle_state::randomize(18);
 
 	/*
 
