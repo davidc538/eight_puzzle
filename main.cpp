@@ -407,30 +407,30 @@ std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& 
 		auto current = queue.top();
 		queue.pop();
 
-		auto vec = current.all_possible_moves();
+		auto all = current.all_possible_moves();
 
-		for (const auto& current : vec)
+		for (const auto& i : all)
 		{
-			if (current.current.is_solved())
+			if (i.current.is_solved())
 			{
-				steps_taken = current.steps_taken;
+				steps_taken = i.steps_taken;
 
 				std::vector<puzzle_state> retVal;
 
-				for (const auto& b : current.previous_states)
+				for (const auto& b : i.previous_states)
 					retVal.push_back(b->copy());
 
 				std::reverse(retVal.begin(), retVal.end());
 
-				retVal.push_back(current.current);
+				retVal.push_back(i.current);
 
 				return retVal;
 			}
 
-			if (std::find(expanded_states.begin(), expanded_states.end(), current.current) == expanded_states.end())
+			if (std::find(expanded_states.begin(), expanded_states.end(), i.current) == expanded_states.end())
 			{
-				queue.push(current);
-				expanded_states.insert(current.current);
+				queue.push(i);
+				expanded_states.insert(i.current);
 			}
 		}
 	}
@@ -449,11 +449,6 @@ void test()
 			"manhattan_distance_heu: " << p.manhattan_distance() << std::endl;
 	}
 }
-
-// seed | steps
-// -------------
-// 18   | 20
-
 
 class BlockTimer
 {
@@ -476,6 +471,10 @@ public:
 		std::cout << "Time: " << time.count() << std::endl;
 	}
 };
+
+// seed | steps
+// -------------
+// 18   | 20
 
 int main(int argc, char** argv)
 {
