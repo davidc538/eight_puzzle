@@ -271,22 +271,6 @@ struct puzzle_state
 		return retVal;
 	}
 
-	bool operator<(const puzzle_state& r) const
-	{
-		int left = manhattan_distance_heuristic();
-		int right = r.manhattan_distance_heuristic();
-		
-		return (left < right);
-	}
-
-	bool operator>(const puzzle_state& r) const
-	{
-		int left = manhattan_distance_heuristic();
-		int right = r.manhattan_distance_heuristic();
-
-		return (left > right);
-	}
-
 	bool operator==(const puzzle_state& r) const
 	{
 		for (int i = 0; i < 9; i++)
@@ -338,11 +322,6 @@ struct puzzle_state_search
 		this->steps_taken = came_from.steps_taken + 1;
 	}
 
-	bool is_solved() const
-	{
-		return current.is_solved();
-	}
-
 	std::vector<puzzle_state_search> all_possible_moves() const
 	{
 		std::vector<puzzle_state> p = current.all_possible_moves();
@@ -389,7 +368,7 @@ std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& 
 
 		for (const auto& current : vec)
 		{
-			if (current.is_solved())
+			if (current.current.is_solved())
 			{
 				steps_taken = current.steps_taken;
 
