@@ -395,10 +395,25 @@ struct hash_comparator
 	}
 };
 
+struct puzzle_state_set
+{
+	std::set<puzzle_state, hash_comparator> _states;
+
+	void insert(const puzzle_state& state)
+	{
+		_states.insert(state);
+	}
+
+	bool contains(const puzzle_state& state)
+	{
+		return (std::find(_states.begin(), _states.end(), state) != _states.end());
+	}
+};
+
 std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& steps_taken)
 {
 	std::priority_queue<puzzle_state_search, std::deque<puzzle_state_search>, distance_hash_comparator> queue;
-	std::set<puzzle_state, hash_comparator> expanded_states;
+	puzzle_state_set expanded_states;
 
 	queue.emplace(initial_state, initial_state, 0);
 
@@ -427,7 +442,7 @@ std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& 
 				return retVal;
 			}
 
-			if (std::find(expanded_states.begin(), expanded_states.end(), i.current) == expanded_states.end())
+			if (!expanded_states.contains(i.current))
 			{
 				queue.push(i);
 				expanded_states.insert(i.current);
