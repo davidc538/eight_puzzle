@@ -11,18 +11,18 @@
 
 struct randomizer
 {
-	std::default_random_engine rand_eng;
+	std::mt19937 rand_eng;
 
 	// pass -1 for random seed
 	randomizer(int seed)
 	{
 		if (seed != -1)
-			new (&rand_eng) std::default_random_engine(seed);
+			new (&rand_eng) std::mt19937(seed);
 		else
 		{
 			std::random_device rand_dev;
 
-			new (&rand_eng) std::default_random_engine(rand_dev());
+			new (&rand_eng) std::mt19937(rand_dev());
 		}
 	}
 
@@ -363,7 +363,7 @@ struct hybrid_comparator
 	}
 };
 
-struct puzzle_state_search_comparator_manhattan_distance
+struct manhattan_distance_comparator
 {
 	bool operator() (const puzzle_state_search& l, const puzzle_state_search& r)
 	{
