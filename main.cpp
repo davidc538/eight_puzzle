@@ -418,7 +418,7 @@ std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& 
 
 int main(int argc, char** argv)
 {
-	puzzle_state initial = puzzle_state::randomize(1);
+	puzzle_state initial = puzzle_state::randomize(25);
 
 	std::cout << "INITIAL STATE: " << std::endl;
 	std::cout << initial.to_string() << std::endl;
