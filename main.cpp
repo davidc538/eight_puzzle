@@ -361,23 +361,26 @@ void test_all_possible_moves()
 
 struct puzzle_state_search
 {
+	//std::shared_ptr<puzzle_state> came_from, current;
 	puzzle_state came_from, current;
 	int steps_taken;
 
 	puzzle_state_search(const puzzle_state& came_from, const puzzle_state& current, int steps_taken)
 	{
-		this->came_from = came_from.copy();
-		this->current = current.copy();
+		//this->came_from = std::make_shared<puzzle_state>(came_from.copy());
+		//this->current = std::make_shared<puzzle_state>(current.copy());
 		this->steps_taken = steps_taken;
 	}
 
 	bool is_solved() const
 	{
+		//return current->is_solved();
 		return current.is_solved();
 	}
 
 	std::vector<puzzle_state_search> all_possible_moves() const
 	{
+		//std::vector<puzzle_state> p = current->all_possible_moves();
 		std::vector<puzzle_state> p = current.all_possible_moves();
 
 		std::vector<puzzle_state_search> r;
@@ -390,6 +393,7 @@ struct puzzle_state_search
 
 	int heuristic() const
 	{
+		//return current->current_heuristic() + steps_taken;
 		return current.current_heuristic() + steps_taken;
 	}
 
@@ -413,6 +417,7 @@ struct puzzle_state_search
 std::vector<puzzle_state_search> find_solution(puzzle_state initial_state)
 {
 	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, std::greater<puzzle_state_search> > q;
+	std::set<puzzle_state> expanded_states;
 
 	q.emplace(initial_state, initial_state, 0);
 
@@ -425,7 +430,11 @@ std::vector<puzzle_state_search> find_solution(puzzle_state initial_state)
 
 		for (const auto& a : v)
 		{
-			q.push(a);
+			if (std::find(expanded_states.begin(), expanded_states.end(), a.current) == expanded_states.end())
+			{
+				q.push(a);
+				expanded_states.insert(a.current);
+			}
 		}
 	}
 
@@ -438,9 +447,12 @@ std::vector<puzzle_state_search> find_solution(puzzle_state initial_state)
 
 int main(int argc, char** argv)
 {
+	/*
 	test_man_dist();
 	test_lots();
 	test_all_possible_moves();
+	*/
+	auto a = find_solution(puzzle_state::randomize());
 
 	std::cin.get();
 }
