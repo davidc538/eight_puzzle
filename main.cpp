@@ -369,6 +369,8 @@ struct puzzle_state_search
 	{
 		//this->came_from = std::make_shared<puzzle_state>(came_from.copy());
 		//this->current = std::make_shared<puzzle_state>(current.copy());
+		this->came_from = came_from.copy();
+		this->current = current.copy();
 		this->steps_taken = steps_taken;
 	}
 
@@ -414,7 +416,7 @@ struct puzzle_state_search
 	}
 };
 
-std::vector<puzzle_state_search> find_solution(puzzle_state initial_state)
+std::vector<puzzle_state_search> find_solution(const puzzle_state& initial_state)
 {
 	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, std::greater<puzzle_state_search> > q;
 	std::set<puzzle_state> expanded_states;
@@ -430,6 +432,11 @@ std::vector<puzzle_state_search> find_solution(puzzle_state initial_state)
 
 		for (const auto& a : v)
 		{
+			if (a.is_solved())
+			{
+				std::cout << "found solution!" << std::endl;
+			}
+
 			if (std::find(expanded_states.begin(), expanded_states.end(), a.current) == expanded_states.end())
 			{
 				q.push(a);
