@@ -52,7 +52,7 @@ struct puzzle_state
 
 	bool is_solved() const
 	{
-		return (manhattan_distance_heuristic() == 0);
+		return (manhattan_distance() == 0);
 	}
 
 	// for comparisons in std::set
@@ -80,23 +80,23 @@ struct puzzle_state
 	{
 		puzzle_state retVal;
 
-		std::vector<int> chars;
+		std::vector<int> places;
 
 		for (int i = 0; i < 9; i++)
-			chars.push_back(i);
+			places.push_back(i);
 
 		randomizer random(seed);
 
 		for (int i = 0; i < 9; i++)
 		{
-			int index = random.get_uniform_between(0, chars.size() - 1);
-			int temp = chars[index];
+			int index = random.get_uniform_between(0, places.size() - 1);
+			int temp = places[index];
 
 			retVal.places[i] = temp;
 
-			auto it = std::find(chars.begin(), chars.end(), temp);
+			auto it = std::find(places.begin(), places.end(), temp);
 
-			chars.erase(it, it + 1);
+			places.erase(it, it + 1);
 		}
 
 		return retVal;
@@ -257,7 +257,7 @@ struct puzzle_state
 		return retVal;
 	}
 
-	int manhattan_distance_heuristic() const
+	int manhattan_distance() const
 	{
 		int retVal = 0;
 
@@ -352,8 +352,8 @@ struct hybrid_comparator
 	{
 		int l_cor = l.current.correctly_placed_tiles(),
 			r_cor = r.current.correctly_placed_tiles(),
-			l_man = l.current.manhattan_distance_heuristic(),
-			r_man = r.current.manhattan_distance_heuristic(),
+			l_man = l.current.manhattan_distance(),
+			r_man = r.current.manhattan_distance(),
 			l_steps = l.steps_taken,
 			r_steps = r.steps_taken,
 			l_h = (l_cor + l_man + l_steps),
@@ -367,8 +367,8 @@ struct manhattan_distance_comparator
 {
 	bool operator() (const puzzle_state_search& l, const puzzle_state_search& r)
 	{
-		return ((l.current.manhattan_distance_heuristic() + l.steps_taken)
-			> (r.current.manhattan_distance_heuristic() + r.steps_taken));
+		return ((l.current.manhattan_distance() + l.steps_taken)
+			> (r.current.manhattan_distance() + r.steps_taken));
 	}
 };
 
@@ -382,8 +382,8 @@ struct hash_comparator
 
 std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& steps_taken)
 {
-	//std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, puzzle_state_search_comparator_manhattan_distance> queue;
-	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, hybrid_comparator> queue;
+	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, manhattan_distance_comparator> queue;
+	//std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, hybrid_comparator> queue;
 	std::set<puzzle_state, hash_comparator> expanded_states;
 
 	queue.emplace(initial_state, initial_state, 0);
