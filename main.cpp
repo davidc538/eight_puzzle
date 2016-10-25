@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <set>
 #include <memory>
+#include <chrono>
 
 struct randomizer
 {
@@ -259,11 +260,11 @@ struct puzzle_state
 
 	int manhattan_distance() const
 	{
-		int retVal = 0;
+		int retVal = 0, dist, i;
 
-		for (int i = 0; i < 9; i++)
+		for (i = 0; i < 9; i++)
 		{
-			int dist = manhattan_distance_between(i, places[i]);
+			dist = manhattan_distance_between(i, places[i]);
 
 			retVal += dist;
 		}
@@ -396,7 +397,7 @@ struct hash_comparator
 
 std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& steps_taken)
 {
-	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, hybrid_comparator> queue;
+	std::priority_queue<puzzle_state_search, std::deque<puzzle_state_search>, distance_hash_comparator> queue;
 	std::set<puzzle_state, hash_comparator> expanded_states;
 
 	queue.emplace(initial_state, initial_state, 0);
@@ -454,31 +455,56 @@ void test()
 // 18   | 20
 
 
-int main(int argc, char** argv)
+class BlockTimer
 {
-	puzzle_state initial = puzzle_state::randomize(18);
+	std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
 
-	/*
-
-	initial.places[0] = 0; initial.places[1] = 1; initial.places[2] = 2;
-	initial.places[3] = 3; initial.places[4] = 4; initial.places[5] = 5;
-	initial.places[6] = 6; initial.places[7] = 7; initial.places[8] = 8;
-
-	// */
-
-	std::cout << "INITIAL STATE: " << std::endl;
-	std::cout << initial.to_string() << std::endl;
-
-	int steps_taken = -1;
-
-	auto a = find_solution(initial, steps_taken);
-
-	for (const auto& b : a)
+public:
+	BlockTimer()
 	{
-		std::cout << b.to_string() << std::endl;
+		start = std::chrono::high_resolution_clock::now();
 	}
 
-	std::cout << "total steps taken: " << steps_taken << std::endl;
+	~BlockTimer()
+	{
+		end = std::chrono::high_resolution_clock::now();
 
+		std::chrono::duration<double> elapsed_s = end - start;
+
+		auto time = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_s);
+
+		std::cout << "Time: " << time.count() << std::endl;
+	}
+};
+
+int main(int argc, char** argv)
+{
+	{
+		BlockTimer b;
+
+		puzzle_state initial = puzzle_state::randomize(18);
+
+		/*
+
+		initial.places[0] = 0; initial.places[1] = 1; initial.places[2] = 2;
+		initial.places[3] = 3; initial.places[4] = 4; initial.places[5] = 5;
+		initial.places[6] = 6; initial.places[7] = 7; initial.places[8] = 8;
+
+		// */
+
+		std::cout << "INITIAL STATE: " << std::endl;
+		std::cout << initial.to_string() << std::endl;
+
+		int steps_taken = -1;
+
+		auto a = find_solution(initial, steps_taken);
+
+		for (const auto& b : a)
+		{
+			std::cout << b.to_string() << std::endl;
+		}
+
+		std::cout << "total steps taken: " << steps_taken << std::endl;
+	}
 	std::cin.get();
 }
