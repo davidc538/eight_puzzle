@@ -56,11 +56,11 @@ struct puzzle_state
 	}
 
 	// for comparisons in std::set
-	long long hash() const
+	int hash() const
 	{
-		long long retVal = 0;
+		int i, retVal = 0;
 		
-		for (int i = 0; i < 9; i++)
+		for (i = 0; i < 9; i++)
 			retVal += i * places[i];
 
 		return retVal;
@@ -76,7 +76,7 @@ struct puzzle_state
 		return retVal;
 	}
 
-	static puzzle_state randomize()
+	static puzzle_state randomize(int seed)
 	{
 		puzzle_state retVal;
 
@@ -85,7 +85,7 @@ struct puzzle_state
 		for (int i = 0; i < 9; i++)
 			chars.push_back(i);
 
-		randomizer random(-1);
+		randomizer random(seed);
 
 		for (int i = 0; i < 9; i++)
 		{
@@ -310,11 +310,6 @@ struct puzzle_state
 
 		return retVal;
 	}
-
-	int current_heuristic() const
-	{
-		return manhattan_distance_heuristic();
-	}
 };
 
 void test_man_dist()
@@ -339,7 +334,7 @@ void test_lots()
 
 	for (int i = 0; i < 1000000; i++)
 	{
-		puzzle_state p = puzzle_state::randomize();
+		puzzle_state p = puzzle_state::randomize(1);
 
 		//q.insert(p);
 		q.push(p);
@@ -418,35 +413,14 @@ struct puzzle_state_search
 
 		return r;
 	}
-
-	int heuristic() const
-	{
-		return current.current_heuristic() + steps_taken;
-	}
-	// /*
-	bool operator<(const puzzle_state_search& r) const
-	{
-		int h1 = heuristic(),
-			h2 = r.heuristic();
-
-		return (h1 < h2);
-	}
-
-	bool operator>(const puzzle_state_search& r) const
-	{
-		int h1 = heuristic(),
-			h2 = r.heuristic();
-
-		return (h1 > h2);
-	}
-	//*/
 };
 
 struct puzzle_state_search_comparator_manhattan_distance
 {
 	bool operator() (const puzzle_state_search& l, const puzzle_state_search& r)
 	{
-		return (l.current.manhattan_distance_heuristic() < r.current.manhattan_distance_heuristic());
+		return ((l.current.manhattan_distance_heuristic() + l.steps_taken)
+			> (r.current.manhattan_distance_heuristic() + r.steps_taken));
 	}
 };
 
@@ -454,14 +428,13 @@ struct puzzle_state_comparator_hash
 {
 	bool operator() (const puzzle_state& l, const puzzle_state& r) const
 	{
-		return (l.hash() < r.hash());
+		return (l.hash() > r.hash());
 	}
 };
 
 std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& steps_taken)
 {
-	//std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, puzzle_state_search_comparator_manhattan_distance > q;
-	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, std::greater<puzzle_state_search> > queue;
+	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, puzzle_state_search_comparator_manhattan_distance> queue;
 	std::set<puzzle_state, puzzle_state_comparator_hash> expanded_states;
 
 	queue.emplace(initial_state, initial_state, 0);
@@ -509,7 +482,7 @@ int main(int argc, char** argv)
 	test_lots();
 	test_all_possible_moves();
 	*/
-	puzzle_state initial = puzzle_state::randomize();
+	puzzle_state initial = puzzle_state::randomize(1);
 
 	std::cout << "INITIAL STATE: " << std::endl;
 	std::cout << initial.to_string() << std::endl;
