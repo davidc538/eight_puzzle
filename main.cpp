@@ -312,63 +312,6 @@ struct puzzle_state
 	}
 };
 
-void test_man_dist()
-{
-	int i, x, y;
-
-	for (i = 0; i < 9; i++)
-	{
-		puzzle_state::get_x_y_from_place(i, x, y);
-		std::cout << i << " : " << x << " , " << y << std::endl;
-	}
-}
-
-void test_lots()
-{
-	puzzle_state p;
-
-	std::cout << p.to_string() << " , " << p.manhattan_distance_heuristic() << std::endl;
-
-	std::priority_queue<puzzle_state, std::vector<puzzle_state>, std::greater<puzzle_state> > q;
-	//std::set<puzzle_state, std::less<puzzle_state> > q;
-
-	for (int i = 0; i < 1000000; i++)
-	{
-		puzzle_state p = puzzle_state::randomize(1);
-
-		//q.insert(p);
-		q.push(p);
-	}
-
-	while (q.size() > 0)
-	{
-		auto temp = q.top();
-		q.pop();
-		std::cout << temp.to_string() << " : " << temp.manhattan_distance_heuristic() << std::endl;
-	}
-
-	/*
-	for (const auto& temp : q)
-	{
-	std::cout << temp.to_string() << " : " << temp.manhattan_distance_heuristic() << std::endl;
-	}
-	*/
-}
-
-void test_all_possible_moves()
-{
-	puzzle_state p;
-
-	std::cout << p.to_string() << std::endl;
-
-	auto all = p.all_possible_moves();
-
-	for (const auto& t : all)
-	{
-		std::cout << t.to_string() << std::endl;
-	}
-}
-
 struct puzzle_state_search
 {
 	std::vector<std::shared_ptr<puzzle_state> > previous_states;
