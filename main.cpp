@@ -363,12 +363,26 @@ struct hybrid_comparator
 	}
 };
 
-struct manhattan_distance_comparator
+struct distance_comparator
 {
 	bool operator() (const puzzle_state_search& l, const puzzle_state_search& r)
 	{
 		return ((l.current.manhattan_distance() + l.steps_taken)
 			> (r.current.manhattan_distance() + r.steps_taken));
+	}
+};
+
+struct distance_hash_comparator
+{
+	bool operator() (const puzzle_state_search& l, const puzzle_state_search& r)
+	{
+		int l_heur = l.current.manhattan_distance() + l.steps_taken;
+		int r_heur = r.current.manhattan_distance() + r.steps_taken;
+
+		if (l_heur != r_heur)
+			return (l_heur > r_heur);
+		else
+			return (l.current.hash() > r.current.hash());
 	}
 };
 
@@ -382,8 +396,7 @@ struct hash_comparator
 
 std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& steps_taken)
 {
-	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, manhattan_distance_comparator> queue;
-	//std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, hybrid_comparator> queue;
+	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, distance_hash_comparator> queue;
 	std::set<puzzle_state, hash_comparator> expanded_states;
 
 	queue.emplace(initial_state, initial_state, 0);
@@ -424,9 +437,34 @@ std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& 
 	return std::vector<puzzle_state>();
 }
 
+void test()
+{
+	for (int i = 0; i < 100; i++)
+	{
+		puzzle_state p = puzzle_state::randomize(i);
+
+		std::cout << p.to_string() <<
+			"correctly_placed_tiles: " << p.correctly_placed_tiles() << std::endl <<
+			"manhattan_distance_heu: " << p.manhattan_distance() << std::endl;
+	}
+}
+
+// seed | steps
+// -------------
+// 18   | 20
+
+
 int main(int argc, char** argv)
 {
-	puzzle_state initial = puzzle_state::randomize(25);
+	puzzle_state initial = puzzle_state::randomize(20);
+
+	/*
+
+	initial.places[0] = 0; initial.places[1] = 1; initial.places[2] = 2;
+	initial.places[3] = 3; initial.places[4] = 4; initial.places[5] = 5;
+	initial.places[6] = 6; initial.places[7] = 7; initial.places[8] = 8;
+
+	// */
 
 	std::cout << "INITIAL STATE: " << std::endl;
 	std::cout << initial.to_string() << std::endl;
