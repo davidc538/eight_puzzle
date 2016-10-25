@@ -418,11 +418,6 @@ std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& 
 
 int main(int argc, char** argv)
 {
-	/*
-	test_man_dist();
-	test_lots();
-	test_all_possible_moves();
-	*/
 	puzzle_state initial = puzzle_state::randomize(1);
 
 	std::cout << "INITIAL STATE: " << std::endl;
