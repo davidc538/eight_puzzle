@@ -44,6 +44,12 @@ struct puzzle_state
 			places[i] = i;
 	}
 
+	puzzle_state(const puzzle_state& copy_me)
+	{
+		for (int i = 0; i < 9; i++)
+			places[i] = copy_me.places[i];
+	}
+
 	bool is_solved() const
 	{
 		return (manhattan_distance_heuristic() == 0);
@@ -371,14 +377,20 @@ void test_all_possible_moves()
 struct puzzle_state_search
 {
 	//std::shared_ptr<puzzle_state> came_from, current;
-	puzzle_state came_from, current;
+
+	std::vector<std::shared_ptr<puzzle_state> > previous_states;
+	puzzle_state current;
 	int steps_taken;
 
 	puzzle_state_search(const puzzle_state& came_from, const puzzle_state& current, int steps_taken)
 	{
 		//this->came_from = std::make_shared<puzzle_state>(came_from.copy());
 		//this->current = std::make_shared<puzzle_state>(current.copy());
-		this->came_from = came_from.copy();
+		//this->came_from = came_from.copy();
+
+		// this invokes the constructor -> puzzle_state(const puzzle_state& copy_me)
+		previous_states.push_back(std::make_shared<puzzle_state>(came_from));
+
 		this->current = current.copy();
 		this->steps_taken = steps_taken;
 	}
