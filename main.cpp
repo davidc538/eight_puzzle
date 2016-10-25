@@ -372,7 +372,7 @@ struct puzzle_state_search_comparator_manhattan_distance
 	}
 };
 
-struct puzzle_state_comparator_hash
+struct hash_comparator
 {
 	bool operator() (const puzzle_state& l, const puzzle_state& r) const
 	{
@@ -384,7 +384,7 @@ std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& 
 {
 	//std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, puzzle_state_search_comparator_manhattan_distance> queue;
 	std::priority_queue<puzzle_state_search, std::vector<puzzle_state_search>, hybrid_comparator> queue;
-	std::set<puzzle_state, puzzle_state_comparator_hash> expanded_states;
+	std::set<puzzle_state, hash_comparator> expanded_states;
 
 	queue.emplace(initial_state, initial_state, 0);
 
