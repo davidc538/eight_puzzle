@@ -53,7 +53,7 @@ struct puzzle_state
 
 	bool is_solved() const
 	{
-		return (manhattan_distance() == 0);
+		return (correctly_placed_tiles() == 9);
 	}
 
 	// for comparisons in std::set
@@ -336,14 +336,14 @@ struct puzzle_state_search
 
 	std::vector<puzzle_state_search> all_possible_moves() const
 	{
-		std::vector<puzzle_state> p = current.all_possible_moves();
+		std::vector<puzzle_state> all = current.all_possible_moves();
 
-		std::vector<puzzle_state_search> r;
+		std::vector<puzzle_state_search> retVal;
 
-		for (const auto& i : p)
-			r.emplace_back(*this, i);
+		for (const auto& move : all)
+			retVal.emplace_back(*this, move);
 
-		return r;
+		return retVal;
 	}
 };
 
@@ -473,6 +473,7 @@ std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& 
 		}
 	}
 
+	// if we get here, return an empty vector
 	return std::vector<puzzle_state>();
 }
 
