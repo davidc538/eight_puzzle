@@ -10,6 +10,28 @@
 #include <memory>
 #include <chrono>
 
+class BlockTimer
+{
+	std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
+
+public:
+	BlockTimer()
+	{
+		start = std::chrono::high_resolution_clock::now();
+	}
+
+	~BlockTimer()
+	{
+		end = std::chrono::high_resolution_clock::now();
+
+		std::chrono::duration<double> elapsed_s = end - start;
+
+		auto time = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_s);
+
+		std::cout << "Time: " << time.count() << std::endl;
+	}
+};
+
 struct randomizer
 {
 	std::mt19937 rand_eng;
@@ -395,122 +417,88 @@ struct hash_comparator
 	}
 };
 
-struct puzzle_state_search_queue
+struct solver
 {
-	std::priority_queue<puzzle_state_search, std::deque<puzzle_state_search>, distance_hash_comparator> _queue;
+	std::priority_queue<puzzle_state_search, std::deque<puzzle_state_search>, distance_hash_comparator> search_queue;
 
 	void enqueue(const puzzle_state_search& item)
 	{
-		_queue.push(item);
+		search_queue.push(item);
 	}
 
 	puzzle_state_search dequeue()
 	{
-		puzzle_state_search retVal = _queue.top();
+		puzzle_state_search retVal = search_queue.top();
 
-		_queue.pop();
+		search_queue.pop();
 
 		return retVal;
 	}
 
-	bool is_empty()
+	bool search_queue_is_empty()
 	{
-		return _queue.empty();
-	}
-};
-
-struct puzzle_state_set
-{
-	std::set<puzzle_state, hash_comparator> _states;
-
-	void insert(const puzzle_state& state)
-	{
-		_states.insert(state);
+		return search_queue.empty();
 	}
 
-	bool contains(const puzzle_state& state)
+	std::set<puzzle_state, hash_comparator> searched_states;
+
+	void searched_state(const puzzle_state& state)
 	{
-		return (std::find(_states.begin(), _states.end(), state) != _states.end());
+		searched_states.insert(state);
 	}
-};
 
-std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& steps_taken)
-{
-	puzzle_state_search_queue search_queue;
-	puzzle_state_set expanded_states;
-
-	search_queue.enqueue(puzzle_state_search(initial_state, initial_state, 0));
-
-	while (!search_queue.is_empty())
+	bool searched_states_contains(const puzzle_state& state)
 	{
-		auto current = search_queue.dequeue();
+		return (std::find(searched_states.begin(), searched_states.end(), state) != searched_states.end());
+	}
 
-		auto all = current.all_possible_moves();
+	std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& steps_taken)
+	{
+		size_t expanded_states_size, search_queue_size;
 
-		for (const auto& i : all)
+		enqueue(puzzle_state_search(initial_state, initial_state, 0));
+
+		while (!search_queue_is_empty())
 		{
-			if (i.current.is_solved())
+			auto current = dequeue();
+
+			auto all = current.all_possible_moves();
+
+			for (const auto& i : all)
 			{
-				steps_taken = i.steps_taken;
+				if (i.current.is_solved())
+				{
+					steps_taken = i.steps_taken;
 
-				std::vector<puzzle_state> retVal;
+					std::vector<puzzle_state> retVal;
 
-				for (const auto& b : i.previous_states)
-					retVal.push_back(b->copy());
+					for (const auto& b : i.previous_states)
+						retVal.push_back(b->copy());
 
-				std::reverse(retVal.begin(), retVal.end());
+					std::reverse(retVal.begin(), retVal.end());
 
-				retVal.push_back(i.current);
+					retVal.push_back(i.current);
 
-				return retVal;
-			}
+					return retVal;
+				}
 
-			if (!expanded_states.contains(i.current))
-			{
-				search_queue.enqueue(i);
-				expanded_states.insert(i.current);
+				if (!searched_states_contains(i.current))
+				{
+					enqueue(i);
+					searched_state(i.current);
+
+					expanded_states_size = searched_states.size();
+					search_queue_size = search_queue.size();
+				}
 			}
 		}
-	}
 
-	// if we get here, return an empty vector
-	return std::vector<puzzle_state>();
-}
+		std::cout << "ex: " << expanded_states_size << " , q: " << search_queue_size << std::endl;
 
-void test()
-{
-	for (int i = 0; i < 100; i++)
-	{
-		puzzle_state p = puzzle_state::randomize(i);
-
-		std::cout << p.to_string() <<
-			"correctly_placed_tiles: " << p.correctly_placed_tiles() << std::endl <<
-			"manhattan_distance_heu: " << p.manhattan_distance() << std::endl;
-	}
-}
-
-class BlockTimer
-{
-	std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
-
-public:
-	BlockTimer()
-	{
-		start = std::chrono::high_resolution_clock::now();
-	}
-
-	~BlockTimer()
-	{
-		end = std::chrono::high_resolution_clock::now();
-
-		std::chrono::duration<double> elapsed_s = end - start;
-
-		auto time = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_s);
-
-		std::cout << "Time: " << time.count() << std::endl;
+		// if we get here, return an empty vector
+		return std::vector<puzzle_state>();
 	}
 };
-
 // seed | steps
 // -------------
 // 18   | 20
@@ -535,7 +523,9 @@ int main(int argc, char** argv)
 
 		int steps_taken = -1;
 
-		auto a = find_solution(initial, steps_taken);
+		solver _solver;
+
+		auto a = _solver.find_solution(initial, steps_taken);
 
 		for (const auto& b : a)
 		{
