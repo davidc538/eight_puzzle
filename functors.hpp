@@ -6,8 +6,15 @@ struct puzzle_state_comparator
 {
 	bool operator() (const puzzle_state& l, const puzzle_state& r) const
 	{
-		return ((l.manhattan_distance() + l.steps_taken)
-			< (r.manhattan_distance() + r.steps_taken));
+		int l_manh = l.manhattan_distance(),
+			r_manh = r.manhattan_distance(),
+			l_hash = l.hash(),
+			r_hash = r.hash();
+
+		if (l_manh == r_manh)
+			return (l_hash < r_hash);
+		else
+			return (l_manh < r_manh);
 	}
 };
 

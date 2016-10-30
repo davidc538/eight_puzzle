@@ -38,11 +38,13 @@ public:
 
 void log(const std::string& log_string, const puzzle_state& state)
 {
+	return;
 	std::cout << state.to_string_short() << "             : " << log_string << std::endl;
 }
 
 void log2(const std::string& log_string, const puzzle_state& first, const puzzle_state& second)
 {
+	return;
 	std::cout << first.to_string_short() << "|" << second.to_string_short() << " : " << log_string << std::endl;
 }
 
@@ -72,33 +74,23 @@ struct special_queue
 		auto it = states_previous.find(state);
 		
 		// if we already have a cheaper or equal cost route to this state: return
-		if (it != states_previous.end() && it->first.steps_taken <= state.steps_taken)
+		if (it != states_previous.end())// && it->first.steps_taken <= state.steps_taken)
 			return;
-
+		/*
 		// if we already have a more expensive route to this state:
-		// erase it from the search queue and overwrite it
+		// overwrite it in the states_previous map
 		if (it != states_previous.end() && it->first.steps_taken > state.steps_taken)
 		{
-			//puzzle_state temp = it->first;
-			//search_queue.erase(temp);
-			//search_queue.erase(state);
-
-			puzzle_state temp = state;
-
-			for (int i = 0; i < 100; i++)
-			{
-				temp.steps_taken = i;
-
-				if (search_queue.find(temp) != search_queue.end())
-				{
-					log("erasing", temp);
-					search_queue.erase(temp);
-				}
-			}
 		}
-
+		*/
 		log2("map", state, prev);
 		states_previous[state] = prev;
+
+		if (search_queue.find(state) != search_queue.end())
+		{
+			log("already enqueued", state);
+			return;
+		}
 
 		log("enqueue", state);
 		search_queue.insert(state);
@@ -106,7 +98,14 @@ struct special_queue
 
 	puzzle_state get_previous_for(const puzzle_state& state) const
 	{
-		return (states_previous.find(state)->second);
+		auto it = states_previous.find(state);
+
+		if (it != states_previous.end())
+			return it->second;
+		else
+			return puzzle_state();
+
+		//return (states_previous.find(state)->second);
 	}
 
 	std::vector<puzzle_state> find_solution(const puzzle_state& initial_state)
@@ -123,6 +122,8 @@ struct special_queue
 
 			for (const puzzle_state& move : all_possible_moves)
 			{
+				discover_adjacent(move, start);
+
 				if (move.is_solved())
 				{
 					std::vector<puzzle_state> retVal;
@@ -136,10 +137,10 @@ struct special_queue
 						i = get_previous_for(i);
 					}
 
+					std::reverse(retVal.begin(), retVal.end());
+
 					return retVal;
 				}
-
-				discover_adjacent(move, start);
 			}
 		}
 
@@ -258,6 +259,8 @@ int main(int argc, char** argv)
 		{
 			std::cout << b.to_string() << std::endl;
 		}
+
+		steps_taken = a.size();
 
 		std::cout << "total steps taken: " << steps_taken << std::endl;
 	}
