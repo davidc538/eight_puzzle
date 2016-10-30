@@ -2,9 +2,18 @@
 
 #include "puzzle_state.hpp"
 
+struct puzzle_state_comparator
+{
+	bool operator() (const puzzle_state& l, const puzzle_state& r) const
+	{
+		return ((l.manhattan_distance() + l.steps_taken)
+			> (r.manhattan_distance() + r.steps_taken));
+	}
+};
+
 struct hybrid_comparator
 {
-	bool operator() (const puzzle_state_search& l, const puzzle_state_search& r)
+	bool operator() (const puzzle_state_search& l, const puzzle_state_search& r) const
 	{
 		int l_cor = l.current.correctly_placed_tiles(),
 			r_cor = r.current.correctly_placed_tiles(),
@@ -21,7 +30,7 @@ struct hybrid_comparator
 
 struct distance_comparator
 {
-	bool operator() (const puzzle_state_search& l, const puzzle_state_search& r)
+	bool operator() (const puzzle_state_search& l, const puzzle_state_search& r) const
 	{
 		return ((l.current.manhattan_distance() + l.steps_taken)
 			> (r.current.manhattan_distance() + r.steps_taken));
@@ -30,7 +39,7 @@ struct distance_comparator
 
 struct distance_hash_comparator
 {
-	bool operator() (const puzzle_state_search& l, const puzzle_state_search& r)
+	bool operator() (const puzzle_state_search& l, const puzzle_state_search& r) const
 	{
 		int l_heur = l.current.manhattan_distance() + l.steps_taken;
 		int r_heur = r.current.manhattan_distance() + r.steps_taken;
@@ -42,7 +51,7 @@ struct distance_hash_comparator
 	}
 };
 
-struct hash_comparator
+struct puzzle_state_hash_comparator
 {
 	bool operator() (const puzzle_state& l, const puzzle_state& r) const
 	{

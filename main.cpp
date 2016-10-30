@@ -8,6 +8,8 @@
 #include <set>
 #include <memory>
 #include <chrono>
+#include <map>
+#include <tuple>
 
 #include "functors.hpp"
 #include "puzzle_state.hpp"
@@ -34,9 +36,37 @@ public:
 	}
 };
 
+struct special_queue
+{
+	std::map<puzzle_state, puzzle_state, puzzle_state_hash_comparator> states_previous_map;
+	std::set<puzzle_state, puzzle_state_comparator> search_queue;
+
+	puzzle_state dequeue()
+	{
+		puzzle_state retVal = *search_queue.begin();
+
+		search_queue.erase(retVal);
+
+		return retVal;
+	}
+
+	void discover_adjacent(const puzzle_state& state, const puzzle_state& prev)
+	{
+		auto it = states_previous_map.find(state);
+		
+		// if we already have a cheaper route to this state: return
+		if (it != states_previous_map.end() && it->first.steps_taken < state.steps_taken)
+			return;
+
+		states_previous_map[state] = prev;
+		search_queue.insert(state);
+	}
+};
+
 struct solver
 {
 	std::priority_queue<puzzle_state_search, std::deque<puzzle_state_search>, distance_hash_comparator> search_queue;
+	std::set<puzzle_state, puzzle_state_hash_comparator> found_states;
 
 	void enqueue(const puzzle_state_search& item)
 	{
@@ -57,16 +87,14 @@ struct solver
 		return search_queue.empty();
 	}
 
-	std::set<puzzle_state, hash_comparator> searched_states;
-
 	void searched_state(const puzzle_state& state)
 	{
-		searched_states.insert(state);
+		found_states.insert(state);
 	}
 
 	bool searched_states_contains(const puzzle_state& state)
 	{
-		return (std::find(searched_states.begin(), searched_states.end(), state) != searched_states.end());
+		return (std::find(found_states.begin(), found_states.end(), state) != found_states.end());
 	}
 
 	std::vector<puzzle_state> find_solution(const puzzle_state& initial_state, int& steps_taken)
@@ -104,7 +132,7 @@ struct solver
 					enqueue(i);
 					searched_state(i.current);
 
-					expanded_states_size = searched_states.size();
+					expanded_states_size = found_states.size();
 					search_queue_size = search_queue.size();
 				}
 			}
@@ -128,11 +156,9 @@ int main(int argc, char** argv)
 		puzzle_state initial = puzzle_state::randomize(18);
 
 		/*
-
 		initial.places[0] = 0; initial.places[1] = 1; initial.places[2] = 2;
 		initial.places[3] = 3; initial.places[4] = 4; initial.places[5] = 5;
 		initial.places[6] = 6; initial.places[7] = 7; initial.places[8] = 8;
-
 		// */
 
 		std::cout << "INITIAL STATE: " << std::endl;
