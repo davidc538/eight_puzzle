@@ -38,7 +38,7 @@ public:
 
 struct special_queue
 {
-	std::map<puzzle_state, puzzle_state, puzzle_state_hash_comparator> states_previous_map;
+	std::map<puzzle_state, puzzle_state, puzzle_state_hash_comparator> states_previous;
 	std::set<puzzle_state, puzzle_state_comparator> search_queue;
 
 	puzzle_state dequeue()
@@ -52,14 +52,27 @@ struct special_queue
 
 	void discover_adjacent(const puzzle_state& state, const puzzle_state& prev)
 	{
-		auto it = states_previous_map.find(state);
+		auto it = states_previous.find(state);
 		
 		// if we already have a cheaper route to this state: return
-		if (it != states_previous_map.end() && it->first.steps_taken < state.steps_taken)
+		if (it != states_previous.end() && it->first.steps_taken < state.steps_taken)
 			return;
 
-		states_previous_map[state] = prev;
+		// if we already have a more expensive route to this state:
+		// erase it from the search queue and overwrite it
+		if (it != states_previous.end() && it->first.steps_taken > state.steps_taken)
+		{
+			puzzle_state temp = it->first;
+			search_queue.erase(temp);
+		}
+
+		states_previous[state] = prev;
 		search_queue.insert(state);
+	}
+
+	puzzle_state get_previous_for(const puzzle_state& state) const
+	{
+		return (states_previous.find(state)->second);
 	}
 };
 
