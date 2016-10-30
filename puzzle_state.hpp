@@ -4,6 +4,7 @@
 #include <random>
 #include <string>
 #include <memory>
+#include <math.h>
 
 struct randomizer
 {
@@ -60,10 +61,13 @@ struct puzzle_state
 	// for comparisons in std::set
 	int hash() const
 	{
-		int i, retVal = 0;
+		int i, retVal = 0, p;
 
 		for (i = 0; i < 9; i++)
-			retVal += i * places[i];
+		{
+			p = pow(10, i);
+			retVal += p * places[i];
+		}
 
 		return retVal;
 	}
@@ -311,6 +315,13 @@ struct puzzle_state
 		}
 
 		return retVal;
+	}
+
+	std::string to_string_short() const
+	{
+		int _hash = hash();
+
+		return std::to_string(_hash) + "," + std::to_string(steps_taken);
 	}
 };
 

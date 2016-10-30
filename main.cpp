@@ -36,6 +36,16 @@ public:
 	}
 };
 
+void log(const std::string& log_string, const puzzle_state& state)
+{
+	std::cout << state.to_string_short() << "             : " << log_string << std::endl;
+}
+
+void log2(const std::string& log_string, const puzzle_state& first, const puzzle_state& second)
+{
+	std::cout << first.to_string_short() << "|" << second.to_string_short() << " : " << log_string << std::endl;
+}
+
 struct special_queue
 {
 	std::map<puzzle_state, puzzle_state, puzzle_state_hash_comparator> states_previous;
@@ -57,6 +67,8 @@ struct special_queue
 
 	void discover_adjacent(const puzzle_state& state, const puzzle_state& prev)
 	{
+		log("discovering", state);
+
 		auto it = states_previous.find(state);
 		
 		// if we already have a cheaper or equal cost route to this state: return
@@ -67,11 +79,28 @@ struct special_queue
 		// erase it from the search queue and overwrite it
 		if (it != states_previous.end() && it->first.steps_taken > state.steps_taken)
 		{
-			puzzle_state temp = it->first;
-			search_queue.erase(temp);
+			//puzzle_state temp = it->first;
+			//search_queue.erase(temp);
+			//search_queue.erase(state);
+
+			puzzle_state temp = state;
+
+			for (int i = 0; i < 100; i++)
+			{
+				temp.steps_taken = i;
+
+				if (search_queue.find(temp) != search_queue.end())
+				{
+					log("erasing", temp);
+					search_queue.erase(temp);
+				}
+			}
 		}
 
+		log2("map", state, prev);
 		states_previous[state] = prev;
+
+		log("enqueue", state);
 		search_queue.insert(state);
 	}
 
@@ -87,6 +116,8 @@ struct special_queue
 		while (!is_empty())
 		{
 			puzzle_state start = dequeue();
+
+			log("dequeued", start);
 
 			auto all_possible_moves = start.all_possible_moves();
 
