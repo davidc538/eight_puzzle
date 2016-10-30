@@ -293,6 +293,11 @@ struct puzzle_state
 		return true;
 	}
 
+	bool operator!=(const puzzle_state& r) const
+	{
+		return (!(*this == r));
+	}
+
 	std::string to_string() const
 	{
 		std::string retVal = "";

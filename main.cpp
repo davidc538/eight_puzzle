@@ -41,6 +41,11 @@ struct special_queue
 	std::map<puzzle_state, puzzle_state, puzzle_state_hash_comparator> states_previous;
 	std::set<puzzle_state, puzzle_state_comparator> search_queue;
 
+	bool is_empty() const
+	{
+		return search_queue.empty();
+	}
+
 	puzzle_state dequeue()
 	{
 		puzzle_state retVal = *search_queue.begin();
@@ -54,8 +59,8 @@ struct special_queue
 	{
 		auto it = states_previous.find(state);
 		
-		// if we already have a cheaper route to this state: return
-		if (it != states_previous.end() && it->first.steps_taken < state.steps_taken)
+		// if we already have a cheaper or equal cost route to this state: return
+		if (it != states_previous.end() && it->first.steps_taken <= state.steps_taken)
 			return;
 
 		// if we already have a more expensive route to this state:
@@ -73,6 +78,41 @@ struct special_queue
 	puzzle_state get_previous_for(const puzzle_state& state) const
 	{
 		return (states_previous.find(state)->second);
+	}
+
+	std::vector<puzzle_state> find_solution(const puzzle_state& initial_state)
+	{
+		discover_adjacent(initial_state, initial_state);
+
+		while (!is_empty())
+		{
+			puzzle_state start = dequeue();
+
+			auto all_possible_moves = start.all_possible_moves();
+
+			for (const puzzle_state& move : all_possible_moves)
+			{
+				if (move.is_solved())
+				{
+					std::vector<puzzle_state> retVal;
+
+					puzzle_state i = move;
+
+					while (i != initial_state)
+					{
+						retVal.push_back(i);
+
+						i = get_previous_for(i);
+					}
+
+					return retVal;
+				}
+
+				discover_adjacent(move, start);
+			}
+		}
+
+		return std::vector<puzzle_state>();
 	}
 };
 
@@ -179,9 +219,9 @@ int main(int argc, char** argv)
 
 		int steps_taken = -1;
 
-		solver _solver;
+		special_queue _solver;
 
-		auto a = _solver.find_solution(initial, steps_taken);
+		auto a = _solver.find_solution(initial);
 
 		for (const auto& b : a)
 		{

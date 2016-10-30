@@ -7,7 +7,7 @@ struct puzzle_state_comparator
 	bool operator() (const puzzle_state& l, const puzzle_state& r) const
 	{
 		return ((l.manhattan_distance() + l.steps_taken)
-			> (r.manhattan_distance() + r.steps_taken));
+			< (r.manhattan_distance() + r.steps_taken));
 	}
 };
 
