@@ -174,7 +174,6 @@ int main(int argc, char** argv)
 {
 	puzzle_state initial;
 
-
 	initial.set(0, 3).set(1, 1).set(2, 0);
 	initial.set(3, 6).set(4, 4).set(5, 2);
 	initial.set(6, 7).set(7, 8).set(8, 5);
