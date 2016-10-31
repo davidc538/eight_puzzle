@@ -22,7 +22,7 @@ struct puzzle_state_hash_comparator
 {
 	bool operator() (const puzzle_state& l, const puzzle_state& r) const
 	{
-		return (l.hash() > r.hash());
+		return (l.hash() < r.hash());
 	}
 };
 
