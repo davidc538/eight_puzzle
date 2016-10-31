@@ -1,7 +1,8 @@
 C_FILES=main.cpp
 H_FILES=
 STD=-std=c++11
-R_FLAGS=-O3 -s -Wall
+O_FLAGS=-fno-omit-frame-pointer
+R_FLAGS=-Ofast -s -Wall
 D_FLAGS=-g -Wall
 
 all: eight_gcc eight_gcc_d eight_clang eight_clang_d
