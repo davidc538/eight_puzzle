@@ -319,9 +319,12 @@ struct puzzle_state
 
 	std::string to_string_short() const
 	{
-		int _hash = hash();
+		std::string retVal = "";
 
-		return std::to_string(_hash);
+		for (int i = 0; i < 9; i++)
+			retVal += std::to_string(places[i]);
+
+		return retVal;
 	}
 };
 
