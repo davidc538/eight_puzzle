@@ -35,22 +35,16 @@ struct puzzle_state
 {
 	int places[9];
 
-	int steps_taken;
-
 	puzzle_state()
 	{
 		for (int i = 0; i < 9; i++)
 			places[i] = i;
-
-		steps_taken = 0;
 	}
 
 	puzzle_state(const puzzle_state& copy_me)
 	{
 		for (int i = 0; i < 9; i++)
 			places[i] = copy_me.places[i];
-
-		steps_taken = copy_me.steps_taken + 1;
 	}
 
 	puzzle_state& set(int place, int value)
@@ -327,6 +321,7 @@ struct puzzle_state
 	{
 		int _hash = hash();
 
-		return std::to_string(_hash) + "," + std::to_string(steps_taken);
+		return std::to_string(_hash);
 	}
 };
+
