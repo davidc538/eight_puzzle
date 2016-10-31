@@ -52,6 +52,7 @@ struct solver
 {
 	std::map<puzzle_state, puzzle_state, puzzle_state_hash_comparator> states_previous;
 	std::set<puzzle_state, puzzle_state_comparator> _search_queue;
+	//std::priority_queue<puzzle_state, std::deque<puzzle_state>, puzzle_state_comparator> _search_queue;
 
 	bool is_empty() const
 	{
@@ -60,9 +61,15 @@ struct solver
 
 	puzzle_state dequeue()
 	{
+		
 		puzzle_state retVal = *_search_queue.begin();
 
 		_search_queue.erase(retVal);
+		//*/
+
+		//puzzle_state retVal = _search_queue.top();
+
+		//_search_queue.pop();
 
 		return retVal;
 	}
@@ -70,10 +77,12 @@ struct solver
 	void enqueue(const puzzle_state& state)
 	{
 		_search_queue.insert(state);
+		//_search_queue.push(state);
 	}
 
 	bool is_inqueued(const puzzle_state& state) const
 	{
+		//return false;
 		return (_search_queue.find(state) != _search_queue.end());
 	}
 
