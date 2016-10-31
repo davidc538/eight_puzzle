@@ -73,7 +73,7 @@ struct solver
 
 	void discover_adjacent(const puzzle_state& state, const puzzle_state& prev)
 	{
-		log("discovering", state);
+		log1("discovering", state);
 
 		auto it = _states_previous.find(state);
 		
@@ -86,11 +86,11 @@ struct solver
 
 		if (is_inqueued(state))
 		{
-			log("already enqueued", state);
+			log1("already enqueued", state);
 			return;
 		}
 
-		log("enqueue", state);
+		log1("enqueue", state);
 		enqueue(state);
 	}
 
@@ -112,7 +112,7 @@ struct solver
 		{
 			puzzle_state start = dequeue();
 
-			log("dequeued", start);
+			log1("dequeued", start);
 
 			auto all_possible_moves = start.all_possible_moves();
 
