@@ -31,15 +31,13 @@ public:
 	}
 };
 
-void log(const std::string& log_string, const puzzle_state& state)
+void log1(const std::string& log_string, const puzzle_state& state)
 {
-	//return;
 	std::cout << state.to_string_short() << "             : " << log_string << std::endl;
 }
 
 void log2(const std::string& log_string, const puzzle_state& first, const puzzle_state& second)
 {
-	//return;
 	std::cout << first.to_string_short() << "|" << second.to_string_short() << " : " << log_string << std::endl;
 }
 
@@ -47,7 +45,6 @@ struct solver
 {
 	std::map<puzzle_state, puzzle_state, puzzle_state_hash_comparator> _states_previous;
 	std::set<puzzle_state, puzzle_state_comparator> _search_queue;
-	//std::priority_queue<puzzle_state, std::deque<puzzle_state>, puzzle_state_comparator> _search_queue;
 
 	bool is_empty() const
 	{
@@ -60,11 +57,6 @@ struct solver
 		puzzle_state retVal = *_search_queue.begin();
 
 		_search_queue.erase(retVal);
-		//*/
-
-		//puzzle_state retVal = _search_queue.top();
-
-		//_search_queue.pop();
 
 		return retVal;
 	}
@@ -72,12 +64,10 @@ struct solver
 	void enqueue(const puzzle_state& state)
 	{
 		_search_queue.insert(state);
-		//_search_queue.push(state);
 	}
 
 	bool is_inqueued(const puzzle_state& state) const
 	{
-		//return false;
 		return (_search_queue.find(state) != _search_queue.end());
 	}
 
@@ -112,8 +102,6 @@ struct solver
 			return it->second;
 		else
 			return puzzle_state();
-
-		//return (states_previous.find(state)->second);
 	}
 
 	std::vector<puzzle_state> find_solution(const puzzle_state& initial_state)
@@ -161,19 +149,11 @@ struct solver
 
 int main(int argc, char** argv)
 {
-	puzzle_state initial;// = puzzle_state::randomize(16);
-
-	// 0 1 2
-	// 3 4 5
-	// 6 7 8
-
-	///*
+	puzzle_state initial;
 
 	initial.set(0, 3).set(1, 1).set(2, 0);
 	initial.set(3, 6).set(4, 4).set(5, 2);
 	initial.set(6, 7).set(7, 8).set(8, 5);
-
-	//*/
 
 	std::cout << "INITIAL STATE: " << std::endl;
 	std::cout << initial.to_string() << std::endl;
