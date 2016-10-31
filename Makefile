@@ -1,5 +1,5 @@
 C_FILES=main.cpp
-H_FILES=
+H_FILES=functors.hpp puzzle_state.hpp
 STD=-std=c++11
 O_FLAGS=-fno-omit-frame-pointer
 R_FLAGS=-Ofast -s -Wall
