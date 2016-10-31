@@ -194,6 +194,4 @@ int main(int argc, char** argv)
 	steps_taken = solution.size();
 
 	std::cout << "total steps taken: " << steps_taken << std::endl;
-	
-	std::cin.get();
 }
