@@ -25,7 +25,7 @@ public:
 
 		std::chrono::duration<double> elapsed_s = end - start;
 
-		auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed_s);
+		auto time = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_s);
 
 		std::cout << "Time: " << time.count() << std::endl;
 	}
