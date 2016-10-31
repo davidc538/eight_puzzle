@@ -12,10 +12,12 @@
 class BlockTimer
 {
 	std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
+	unsigned long long* output;
 
 public:
-	BlockTimer()
+	BlockTimer(unsigned long long* output)
 	{
+		this->output = output;
 		start = std::chrono::high_resolution_clock::now();
 	}
 
@@ -27,7 +29,8 @@ public:
 
 		auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed_s);
 
-		std::cout << "Time: " << time.count() << std::endl;
+		if (this->output != nullptr)
+			*this->output = time.count();
 	}
 };
 
@@ -130,7 +133,7 @@ struct solver
 
 			log1("dequeued", start);
 
-			auto all_possible_moves = start.all_possible_moves();
+			std::vector<puzzle_state> all_possible_moves = start.all_possible_moves();
 
 			for (const puzzle_state& move : all_possible_moves)
 			{
@@ -171,34 +174,38 @@ int main(int argc, char** argv)
 {
 	puzzle_state initial;
 
-/*
+
 	initial.set(0, 3).set(1, 1).set(2, 0);
 	initial.set(3, 6).set(4, 4).set(5, 2);
 	initial.set(6, 7).set(7, 8).set(8, 5);
-
+/*
 	initial.set(0, 7).set(1, 3).set(2, 4);
 	initial.set(3, 2).set(4, 1).set(5, 6);
 	initial.set(6, 5).set(7, 0).set(8, 8);
 */
+/*
 	initial.set(0, 5).set(1, 6).set(2, 0);
 	initial.set(3, 8).set(4, 1).set(5, 2);
 	initial.set(6, 4).set(7, 3).set(8, 7);
+*/
 
+	unsigned long long time = 0;
 	solver _solver;
 
 	std::vector<puzzle_state> solution;
 
 	{
-		BlockTimer b;
+		BlockTimer b(&time);
 
 		solution = _solver.find_solution(initial);
 	}
 
-	for (const auto& b : solution)
+	for (const puzzle_state& b : solution)
 	{
 		std::cout << b.to_string() << std::endl;
 	}
 
+	std::cout << "time             : " << time << std::endl;
 	std::cout << "total steps taken: " << solution.size() << std::endl;
 }
 

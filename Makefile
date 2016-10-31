@@ -1,9 +1,9 @@
 C_FILES=main.cpp
 H_FILES=functors.hpp puzzle_state.hpp
 STD=-std=c++11
-O_FLAGS=-fno-omit-frame-pointer
-R_FLAGS=-Ofast -s -Wall
-D_FLAGS=-g -Wall
+O_FLAGS=-fno-omit-frame-pointer -Ofast
+R_FLAGS=$(O_FLAGS) -s -Wall
+D_FLAGS=$(O_FLAGS) -g -Wall
 
 all: eight_gcc eight_gcc_d eight_clang eight_clang_d
 
