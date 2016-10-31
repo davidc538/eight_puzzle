@@ -1,15 +1,10 @@
 #include <iostream>
 #include <vector>
-#include <deque>
-#include <queue>
-#include <functional>
 #include <string>
 #include <algorithm>
 #include <set>
-#include <memory>
 #include <chrono>
 #include <map>
-#include <tuple>
 
 #include "functors.hpp"
 #include "puzzle_state.hpp"
