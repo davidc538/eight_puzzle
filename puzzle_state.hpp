@@ -53,6 +53,12 @@ struct puzzle_state
 		steps_taken = copy_me.steps_taken + 1;
 	}
 
+	puzzle_state& set(int place, int value)
+	{
+		places[place] = value;
+		return *this;
+	}
+
 	bool is_solved() const
 	{
 		return (correctly_placed_tiles() == 9);

@@ -147,7 +147,13 @@ struct special_queue
 
 int main(int argc, char** argv)
 {
-	puzzle_state initial = puzzle_state::randomize(-1);
+	puzzle_state initial;// = puzzle_state::randomize(16);
+
+	///*
+
+	initial.set(0,0).set(1,2).set(2,1);
+
+	//*/
 
 	std::cout << "INITIAL STATE: " << std::endl;
 	std::cout << initial.to_string() << std::endl;
