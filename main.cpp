@@ -50,7 +50,7 @@ void log2(const std::string& log_string, const puzzle_state& first, const puzzle
 
 struct solver
 {
-	std::map<puzzle_state, puzzle_state, puzzle_state_hash_comparator> states_previous;
+	std::map<puzzle_state, puzzle_state, puzzle_state_hash_comparator> _states_previous;
 	std::set<puzzle_state, puzzle_state_comparator> _search_queue;
 	//std::priority_queue<puzzle_state, std::deque<puzzle_state>, puzzle_state_comparator> _search_queue;
 
@@ -90,14 +90,14 @@ struct solver
 	{
 		log("discovering", state);
 
-		auto it = states_previous.find(state);
+		auto it = _states_previous.find(state);
 		
 		// if we already have a cheaper or equal cost route to this state: return
-		if (it != states_previous.end())
+		if (it != _states_previous.end())
 			return;
 
 		log2("map", state, prev);
-		states_previous[state] = prev;
+		_states_previous[state] = prev;
 
 		if (is_inqueued(state))
 		{
@@ -111,9 +111,9 @@ struct solver
 
 	puzzle_state get_previous_for(const puzzle_state& state) const
 	{
-		auto it = states_previous.find(state);
+		auto it = _states_previous.find(state);
 
-		if (it != states_previous.end())
+		if (it != _states_previous.end())
 			return it->second;
 		else
 			return puzzle_state();
