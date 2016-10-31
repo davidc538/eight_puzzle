@@ -133,6 +133,8 @@ struct solver
 						i = get_previous_for(i);
 					}
 
+					retVal.push_back(initial_state);
+
 					std::reverse(retVal.begin(), retVal.end());
 
 					return retVal;
@@ -155,11 +157,6 @@ int main(int argc, char** argv)
 	initial.set(3, 6).set(4, 4).set(5, 2);
 	initial.set(6, 7).set(7, 8).set(8, 5);
 
-	std::cout << "INITIAL STATE: " << std::endl;
-	std::cout << initial.to_string() << std::endl;
-
-	int steps_taken = -1;
-
 	solver _solver;
 
 	std::vector<puzzle_state> solution;
@@ -175,8 +172,6 @@ int main(int argc, char** argv)
 		std::cout << b.to_string() << std::endl;
 	}
 
-	steps_taken = solution.size();
-
-	std::cout << "total steps taken: " << steps_taken << std::endl;
+	std::cout << "total steps taken: " << solution.size() << std::endl;
 }
 
