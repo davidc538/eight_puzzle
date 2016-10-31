@@ -31,14 +31,28 @@ public:
 	}
 };
 
+std::string make_string_longer(const std::string& input, size_t length)
+{
+	std::string retVal = input;
+
+	while (retVal.length() < length)
+		retVal = retVal + " ";
+
+	return retVal;
+}
+
 void log1(const std::string& log_string, const puzzle_state& state)
 {
-	std::cout << state.to_string_short() << "           : " << log_string << std::endl;
+	std::string output = make_string_longer(log_string, 20);
+
+	std::cout << output << ":" << state.to_string_short() << std::endl;
 }
 
 void log2(const std::string& log_string, const puzzle_state& first, const puzzle_state& second)
 {
-	std::cout << first.to_string_short() << "|" << second.to_string_short() << " : " << log_string << std::endl;
+	std::string output = make_string_longer(log_string, 20);
+
+	std::cout << output << ":" << first.to_string_short() << " -> " << second.to_string_short() << std::endl;
 }
 
 struct solver
@@ -124,6 +138,8 @@ struct solver
 
 				if (move.is_solved())
 				{
+					log1("solved", move);
+
 					std::vector<puzzle_state> retVal;
 
 					puzzle_state i = move;
