@@ -38,33 +38,43 @@ public:
 
 void log(const std::string& log_string, const puzzle_state& state)
 {
-	return;
+	//return;
 	std::cout << state.to_string_short() << "             : " << log_string << std::endl;
 }
 
 void log2(const std::string& log_string, const puzzle_state& first, const puzzle_state& second)
 {
-	return;
+	//return;
 	std::cout << first.to_string_short() << "|" << second.to_string_short() << " : " << log_string << std::endl;
 }
 
-struct special_queue
+struct solver
 {
 	std::map<puzzle_state, puzzle_state, puzzle_state_hash_comparator> states_previous;
-	std::set<puzzle_state, puzzle_state_comparator> search_queue;
+	std::set<puzzle_state, puzzle_state_comparator> _search_queue;
 
 	bool is_empty() const
 	{
-		return search_queue.empty();
+		return _search_queue.empty();
 	}
 
 	puzzle_state dequeue()
 	{
-		puzzle_state retVal = *search_queue.begin();
+		puzzle_state retVal = *_search_queue.begin();
 
-		search_queue.erase(retVal);
+		_search_queue.erase(retVal);
 
 		return retVal;
+	}
+
+	void enqueue(const puzzle_state& state)
+	{
+		_search_queue.insert(state);
+	}
+
+	bool is_inqueued(const puzzle_state& state) const
+	{
+		return (_search_queue.find(state) != _search_queue.end());
 	}
 
 	void discover_adjacent(const puzzle_state& state, const puzzle_state& prev)
@@ -80,14 +90,14 @@ struct special_queue
 		log2("map", state, prev);
 		states_previous[state] = prev;
 
-		if (search_queue.find(state) != search_queue.end())
+		if (is_inqueued(state))
 		{
 			log("already enqueued", state);
 			return;
 		}
 
 		log("enqueue", state);
-		search_queue.insert(state);
+		enqueue(state);
 	}
 
 	puzzle_state get_previous_for(const puzzle_state& state) const
@@ -149,9 +159,15 @@ int main(int argc, char** argv)
 {
 	puzzle_state initial;// = puzzle_state::randomize(16);
 
+	// 0 1 2
+	// 3 4 5
+	// 6 7 8
+
 	///*
 
-	initial.set(0,0).set(1,2).set(2,1);
+	initial.set(0, 3).set(1, 1).set(2, 0);
+	initial.set(3, 6).set(4, 4).set(5, 2);
+	initial.set(6, 7).set(7, 8).set(8, 5);
 
 	//*/
 
@@ -160,7 +176,7 @@ int main(int argc, char** argv)
 
 	int steps_taken = -1;
 
-	special_queue _solver;
+	solver _solver;
 
 	std::vector<puzzle_state> solution;
 
