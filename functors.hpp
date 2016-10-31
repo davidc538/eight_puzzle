@@ -25,3 +25,4 @@ struct puzzle_state_hash_comparator
 		return (l.hash() > r.hash());
 	}
 };
+
