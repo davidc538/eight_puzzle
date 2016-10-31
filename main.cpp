@@ -155,9 +155,18 @@ int main(int argc, char** argv)
 {
 	puzzle_state initial;
 
+/*
 	initial.set(0, 3).set(1, 1).set(2, 0);
 	initial.set(3, 6).set(4, 4).set(5, 2);
 	initial.set(6, 7).set(7, 8).set(8, 5);
+
+	initial.set(0, 7).set(1, 3).set(2, 4);
+	initial.set(3, 2).set(4, 1).set(5, 6);
+	initial.set(6, 5).set(7, 0).set(8, 8);
+*/
+	initial.set(0, 5).set(1, 6).set(2, 0);
+	initial.set(3, 8).set(4, 1).set(5, 2);
+	initial.set(6, 4).set(7, 3).set(8, 7);
 
 	solver _solver;
 
