@@ -25,7 +25,7 @@ public:
 
 		std::chrono::duration<double> elapsed_s = end - start;
 
-		auto time = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_s);
+		auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed_s);
 
 		std::cout << "Time: " << time.count() << std::endl;
 	}
@@ -33,7 +33,7 @@ public:
 
 void log1(const std::string& log_string, const puzzle_state& state)
 {
-	std::cout << state.to_string_short() << "             : " << log_string << std::endl;
+	std::cout << state.to_string_short() << "           : " << log_string << std::endl;
 }
 
 void log2(const std::string& log_string, const puzzle_state& first, const puzzle_state& second)
@@ -106,6 +106,8 @@ struct solver
 
 	std::vector<puzzle_state> find_solution(const puzzle_state& initial_state)
 	{
+		log1("initial", initial_state);
+
 		discover_adjacent(initial_state, initial_state);
 
 		while (!is_empty())
